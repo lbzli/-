@@ -337,3 +337,47 @@ let arr = [...arrayLike];
 ```
 上面代码中，arrayLike是一个类似数组的对象，但是没有部署 Iterator 接口，扩展运算符就会报错。这时，可以改为使用Array.from方法将arrayLike转为真正的数组。
 ### Map和Set结构，Generator函数
+
+## Iterator 和for..of循环
+一个数据结构只要部署了Symbol.iterator属性，就可以视为具有iterator接口，就可用for...of循环遍历它的成员，也就是说，for...of循环的内部调用的是数据结构的Symbol.iterator方法
+for...of喧哗可以使用的范围包括数据，set和map结构类似数组的的对象（比如arguments对象，dom NODElist对象），后文的Genrator对象，以及字符串。
+
+### for...of循环与其他的遍历语法的比较
+以数组为例，javascript提供的多种遍历语法。最原始的写法就是
+for循环
+```javascript
+for(var index = 0 ;index < myArray.length; index++) {
+  console.log9myArray[index]);
+}
+```
+
+foreach的缺点
+1 foreach循环无法跳出循环，break命令或return命令都不能奏效
+
+for...in 的缺点
+1. 数组的键名
+2. for...in循环不仅遍历数字的键名，还会遍历手动添加的其他的键，甚至包括原型链上的键
+3. 某些情况下，for...in循环会以任意的顺序遍历键名。
+
+总之，for...in循环主要是为了遍历对象而设计的，不适用于遍历数组。
+
+for...of循环相比上面的几种做法，有一些显著的优点。
+
+- 有着同for...in一样简洁的语法，但是没有for...in的那些缺点
+- 不同于forEach犯法，他可以于break，continue和return配合使用。
+- 提供了遍历数据结构的统一操作接口
+
+## Generator
+### Generator函数
+调用Generator函数，会返回一个**遍历器对象**，代表Generator函数的内部的指针。以后每一个调用遍历器的next方法就会返回一个有着value和done两个属性的对象。value属性表示当前的内部的状态的值，是yield表达式后面的值；done属性是一个布尔值，表示是否遍历结束
+。
+
+### yield表达式
+遍历器对象的next方法的运行逻辑如下：
+1. 遇到yield表达式，就暂停执行后面的操作，并将紧跟在yield后面的那个表达式的值，转为返回对象对的那个value的属性值。
+2. 下一次调用next方法时，在继续往下执行，知道遇到下一个yield表达式。
+3. 如果没有在遇到新的yield表达式，就一直运行到函数结束，知道return语句为止，并将return语句后面的表达式的值，转为返回的对象的value的属性值。
+4. 如果该函数没有return语句，则返回对象的value的属性值为undefined。
+
+需要注意的是，yield表达式的后面的表达式，只有当调用next方法，内部指针指向该语句时才会执行，因此等于javascript提供了手动的“惰性求值”的语法功能。
+
